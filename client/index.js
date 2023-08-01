@@ -5,20 +5,38 @@ const box = document.getElementById('box')
 async function fetchImage(){
     const data = await fetch(URL_API);
     const reader = data.body
-    /*const blob = await data.blob()
+    
+    const blob = await data.blob()
     const url = URL.createObjectURL(blob);
-    const imgElement = document.createElement('img');
+    buildImage(url);
+    //const imgElement = document.createElement('img');
+    /*
     imgElement.src = url;
     imageContainer.appendChild(imgElement);*/
-    reader.pipeThrough(
+    /*reader.pipeThrough(
         new TransformStream(new GetColorsImage())
     ).pipeTo(
         new WritableStream({
             write(chunk,controller){
-                console.log('chunk')
+                buildImage
             }
         })
-    )
+    )*/
+
+}
+
+const buildImage = (blobUrl) => {
+    const canvas = document.getElementById("canvas");
+    const image = new Image();
+
+    image.onload = () => {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext("2d");
+        context.drawImage(image,0, 0)
+    }
+
+    image.src = blobUrl
 
 }
 
