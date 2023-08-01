@@ -1,6 +1,7 @@
 const URL_API = 'http://localhost:8080';
 const imageContainer = document.getElementById('image');
 const box = document.getElementById('box')
+const boxTwo = document.getElementById('boxTwo')
 
 async function fetchImage(){
     const data = await fetch(URL_API);
@@ -15,22 +16,29 @@ const buildImage = (blobUrl) => {
     image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
+        console.log(image.height)
         const context = canvas.getContext("2d");
         context.drawImage(image,0, 0)
 
-        const imageData = context.getImageData(0,0, 6, image.height);
-        const rgbaColors = extractImageColors(imageData.data);
-        
-        const quatizationColors = medianCutQuantization(rgbaColors, 0);
-        
-        console.log(quatizationColors)
+        const imageData = context.getImageData(0,0, image.width, image.height);
 
+        const rgbaColors = extractImageColors(imageData.data);
+
+        const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width)
+    
+        const leftPixels = getLeftPixels(imageMatrix,10)
+
+        const rightPixels = getRightPixels(imageMatrix,10)
+
+        const quatizationColors = medianCutQuantization(rightPixels, 0);
+
+        
         quatizationColors.forEach(color=>{
             const div = document.createElement("div");
             div.style.width = "10px";
             div.style.height = "2.2px";
-            div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},${color.a})`
-            box.appendChild(div);
+            div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},.7)`
+            boxTwo.appendChild(div);
         })
 
     }
@@ -133,6 +141,41 @@ const getBiggestChannelRange = (rgbaColors) => {
     }else{
         return "a"
     }
+}
+
+const transformImageInto2dMatrix = (colorArray,imageWidth) => {
+
+    const imageMatrixLength = Math.round(colorArray.length / imageWidth);
+    let imageMatrix = new Array(imageMatrixLength);
+
+    for(let i = 0; i < imageMatrixLength; i++){
+        imageMatrix[i] = colorArray.slice((i*imageWidth), (i+1)*imageWidth)
+    }
+
+    return imageMatrix
+}
+
+const getLeftPixels = (imageMatrix, numPixels) => {
+    const pixels = [];
+    for(let i = 0; i < imageMatrix.length; i++){
+        for(let j = 0; j < numPixels; j++){
+            pixels.push(imageMatrix[i][j])
+        }
+    }
+    return pixels;
+}
+
+const getRightPixels = (imageMatrix, numPixels) => {
+    const pixels = [];
+    for(let i = 0; i < imageMatrix.length; i++){
+        for(let j = 0; j < imageMatrix[i].length; j++){
+            
+            if(j > imageMatrix[i].length - numPixels){
+                pixels.push(imageMatrix[i][j])
+            }
+        }
+    }
+    return pixels;
 }
 
 (async()=>{
