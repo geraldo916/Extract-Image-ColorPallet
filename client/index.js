@@ -13,16 +13,25 @@ const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
     const image = new Image();
     image.onload = () => {
-        canvas.width = 20;
+        canvas.width = image.width;
         canvas.height = image.height;
         const context = canvas.getContext("2d");
         context.drawImage(image,0, 0)
 
-        const imageData = context.getImageData(0,0, 20, image.height);
+        const imageData = context.getImageData(0,0, 6, image.height);
         const rgbaColors = extractImageColors(imageData.data);
         
         const quatizationColors = medianCutQuantization(rgbaColors, 0);
+        
         console.log(quatizationColors)
+
+        quatizationColors.forEach(color=>{
+            const div = document.createElement("div");
+            div.style.width = "10px";
+            div.style.height = "2.2px";
+            div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},${color.a})`
+            box.appendChild(div);
+        })
 
     }
     image.src = blobUrl
@@ -56,7 +65,7 @@ const extractImageColors = (imageData) => {
  */
 
 const medianCutQuantization = (rgbaColors, depth) => {
-    const COLOR_DEPHT = 4;
+    const COLOR_DEPHT = 8;
 
     // Base case
     if(depth === COLOR_DEPHT || rgbaColors === 0){
@@ -77,7 +86,7 @@ const medianCutQuantization = (rgbaColors, depth) => {
     }
 
     const biggestChannelRange = getBiggestChannelRange(rgbaColors);
-    rgbaColors.sort((p1,p2) => p1[biggestChannelRange] - p2[biggestChannelRange]);
+    //rgbaColors.sort((p1,p2) => p1[biggestChannelRange] - p2[biggestChannelRange]);
 
     const mid = rgbaColors.length / 2;
     return [
