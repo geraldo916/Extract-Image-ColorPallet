@@ -35,8 +35,8 @@ const buildImage = (blobUrl) => {
         const quatizationColorsRight = medianCutQuantization(rightPixels, 0);
         const quatizationColorsLeft = medianCutQuantization(leftPixels, 0);
 
-        createAmbienteMode(quatizationColorsLeft,box);
-        createAmbienteMode(quatizationColorsRight, boxTwo)
+        createAmbienteMode(quatizationColorsLeft,box,"to left");
+        createAmbienteMode(quatizationColorsRight,boxTwo,"to right")
         
         
 
@@ -206,12 +206,23 @@ const getUpPixels = (imageMatrix, numPixels) => {
  * @param {HTMLElement} mainElement 
  */
 
-const createAmbienteMode = (colors, mainElement) => {
+const createAmbienteMode = (colors, mainElement,direction) => {
+    const directionGradient = direction;
     colors.forEach(color=>{
         const div = document.createElement("div");
+        const color1 = `rgba(${color.r},${color.g},${color.b},1)`;
+
+        const lightenFactor = 100;
+        const r = Math.min(255, color.r + lightenFactor);
+        const g = Math.min(255, color.g + lightenFactor);
+        const b = Math.min(255, color.b + lightenFactor);
+
+  // Create the second color using the modified RGB values
+        const color2 = `rgba(${r}, ${g}, ${b},0.06486344537815125)`;
+        const gradientBacckground = `linear-gradient(${directionGradient}, ${color1} 0%, ${color2} 100%)`
         div.style.width = `180px`;
-        div.style.height = "3.2px";
-        div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},.2)`
+        div.style.height = "2.2px";
+        div.style.background = gradientBacckground;
         mainElement.appendChild(div);
     })
 
