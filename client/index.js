@@ -2,6 +2,7 @@ const URL_API = 'http://localhost:8080';
 const imageContainer = document.getElementById('image');
 const box = document.getElementById('box')
 const boxTwo = document.getElementById('boxTwo')
+const pallet = document.getElementById("pallete")
 const AMBIENT_SIZE = 40
 
 async function fetchImage(){
@@ -18,7 +19,6 @@ const buildImage = (blobUrl) => {
     image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
-        console.log(image.height)
         const context = canvas.getContext("2d");
         context.drawImage(image,0, 0)
 
@@ -32,13 +32,15 @@ const buildImage = (blobUrl) => {
 
         const rightPixels = getRightPixels(imageMatrix,AMBIENT_SIZE)
 
-        const quatizationColorsRight = medianCutQuantization(rightPixels, 0);
-        const quatizationColorsLeft = medianCutQuantization(leftPixels, 0);
+        const pallet = extractPalletColorXY(imageMatrix,0,image.height,0,20)
+
+        const quatizationColorsRight = medianCutQuantization(rightPixels, 0,8);
+        const quatizationColorsLeft = medianCutQuantization(leftPixels, 0,8);
+        const quantizationPallet = medianCutQuantization(pallet,0,4);
 
         createAmbienteMode(quatizationColorsLeft,box,"to left");
-        createAmbienteMode(quatizationColorsRight,boxTwo,"to right")
-        
-        
+        createAmbienteMode(quatizationColorsRight,boxTwo,"to right");
+        generatePallet(quantizationPallet);
 
     }
     image.src = blobUrl
@@ -70,11 +72,10 @@ const extractImageColors = (imageData) => {
  * @param {number} depth 
  */
 
-const medianCutQuantization = (rgbaColors, depth) => {
-    const COLOR_DEPHT = 8;
+const medianCutQuantization = (rgbaColors, depth, colorDepth) => {
+    const COLOR_DEPHT = colorDepth;
 
-    // Base case
-    if(depth === COLOR_DEPHT || rgbaColors === 0){
+    if(depth === COLOR_DEPHT || rgbaColors.length === 0){
         const color = rgbaColors.reduce((prev, curr)=>{
             prev.r += curr.r
             prev.g += curr.g
@@ -83,6 +84,7 @@ const medianCutQuantization = (rgbaColors, depth) => {
 
             return prev;
         },{r:0,g:0,b:0,a:0})
+        
         color.r = Math.round(color.r / rgbaColors.length);
         color.g = Math.round(color.g / rgbaColors.length);
         color.b = Math.round(color.b / rgbaColors.length);
@@ -92,12 +94,12 @@ const medianCutQuantization = (rgbaColors, depth) => {
     }
 
     const biggestChannelRange = getBiggestChannelRange(rgbaColors);
-    //rgbaColors.sort((p1,p2) => p1[biggestChannelRange] - p2[biggestChannelRange]);
+    rgbaColors.sort((p1,p2) => p1[biggestChannelRange] - p2[biggestChannelRange]);
 
     const mid = rgbaColors.length / 2;
     return [
-        ...medianCutQuantization(rgbaColors.slice(0, mid), depth + 1),
-        ...medianCutQuantization(rgbaColors.slice(mid + 1), depth + 1)
+        ...medianCutQuantization(rgbaColors.slice(0, mid), depth + 1,colorDepth),
+        ...medianCutQuantization(rgbaColors.slice(mid + 1), depth + 1,colorDepth),
     ]
 }
 
@@ -141,6 +143,20 @@ const getBiggestChannelRange = (rgbaColors) => {
     }
 }
 
+/**
+ * Calculate the color distance between two colors using euclidean distance
+ * @param {*} color1 
+ * @param {*} color2 
+ */
+
+const calculateColorDistance = (color1, color2) => {
+    const rDifference = Math.pow(parseInt(color2.r) - parseInt(color1.r),2);
+    const gDifference = Math.pow(parseInt(color2.g) - parseInt(color1.g),2);
+    const bDifference = Math.pow(parseInt(color2.b) - parseInt(color1.b),2);
+
+    return rDifference + gDifference + bDifference;
+}
+
 const transformImageInto2dMatrix = (colorArray,imageWidth) => {
 
     const imageMatrixLength = Math.round(colorArray.length / imageWidth);
@@ -175,30 +191,42 @@ const getRightPixels = (imageMatrix, numPixels) => {
     }
     return pixels;
 }
-/*
-const getBottomtPixels = (imageMatrix, numPixels) => {
-    const pixels = [];
-    for(let i = 0; i < imageMatrix.length; i++){
-        for(let j = 0; j < numPixels; j++){
-            pixels.push(imageMatrix[i][j])
+
+const generatePallet = (pixels) => {
+    for(let index = 0; index < pixels.length; index++){
+        if(index > 0){
+            const diff = calculateColorDistance(pixels[index], pixels[index - 1])
+            if(diff < 200){
+                continue;
+            }
         }
+        if(pixels[index].r){
+            
+            const div = document.createElement("div");
+            const background = `rgba(${pixels[index].r},${pixels[index].g},${pixels[index].b},1)`;
+            div.style.width = `100px`;
+            div.style.height = "100px";
+            div.style.backgroundColor = background;
+            pallet.appendChild(div);
+        }
+        
     }
-    return pixels;
 }
 
-const getUpPixels = (imageMatrix, numPixels) => {
+const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
     const pixels = [];
     for(let i = 0; i < imageMatrix.length; i++){
-        for(let j = 0; j < imageMatrix[i].length; j++){
-            
-            if(j > imageMatrix[i].length - numPixels){
-                pixels.push(imageMatrix[i][j])
+        if(i <= imageMatrix.length - yStart && i <= yEnd){
+            for(let j = 0; j < imageMatrix[i].length; j++){
+                if(j <= imageMatrix[i].length - xStart && j <= xEnd){
+                    pixels.push(imageMatrix[i][j])
+                }
             }
         }
     }
     return pixels;
 }
-*/
+
 /**
  * 
  * @param {Array} colors 
