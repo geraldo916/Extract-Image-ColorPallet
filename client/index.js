@@ -32,7 +32,7 @@ const buildImage = (blobUrl) => {
 
         const rightPixels = getRightPixels(imageMatrix,AMBIENT_SIZE)
 
-        const pallet = extractPalletColorXY(imageMatrix,0,image.height,0,20)
+        const pallet = extractPalletColorXY(imageMatrix,400,520,0,10)
 
         const quatizationColorsRight = medianCutQuantization(rightPixels, 0,8);
         const quatizationColorsLeft = medianCutQuantization(leftPixels, 0,8);
@@ -216,13 +216,13 @@ const generatePallet = (pixels) => {
 const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
     const pixels = [];
     for(let i = 0; i < imageMatrix.length; i++){
-        if(i <= imageMatrix.length - yStart && i <= yEnd){
+        if(i >= yStart && i <= yEnd){
             for(let j = 0; j < imageMatrix[i].length; j++){
-                if(j <= imageMatrix[i].length - xStart && j <= xEnd){
+                if(j >=  xStart && j <= xEnd){
                     pixels.push(imageMatrix[i][j])
                 }
             }
-        }
+        } 
     }
     return pixels;
 }
