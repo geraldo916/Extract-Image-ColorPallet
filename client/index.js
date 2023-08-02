@@ -43,7 +43,6 @@ const buildImage = (blobUrl) => {
     }
     image.src = blobUrl
 }
-
 /**
  * 
  * @param {Uint8ClampedArray} imageData 
