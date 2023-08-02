@@ -5,22 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Metamorph Image</title>
 </head>
-<body>
-    <main>
+<body style="background-color: #151611;" >
+    <main style="height: 100vh;" >
         <section class="area">
             <div class="container">
-                <div class="image-container" style="display: flex;justify-content: center;" >
+                <div id="image" style="position: absolute;left: 20%;bottom: 20%;" >
+                    <canvas style="border-radius: 8px;" id="canvas" ></canvas>
+                </div>
+                <div class="image-container" style="display: flex;justify-content: space-between;" >
                     <div id="box" >
                         
                     </div>
-                    <div id="image" style="display: flex;justify-content: center;margin-left: 0px;" >
-                        <canvas id="canvas" ></canvas>
-                    </div>
+                    
                     <div id="boxTwo" >
                         
                     </div>
                 </div>
+                
             </div>
+            
         </section>
     </main>
     <script src="pako.min.js"></script>

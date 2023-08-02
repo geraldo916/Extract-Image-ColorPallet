@@ -2,6 +2,7 @@ const URL_API = 'http://localhost:8080';
 const imageContainer = document.getElementById('image');
 const box = document.getElementById('box')
 const boxTwo = document.getElementById('boxTwo')
+const AMBIENT_SIZE = 40
 
 async function fetchImage(){
     const data = await fetch(URL_API);
@@ -13,6 +14,7 @@ async function fetchImage(){
 const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
     const image = new Image();
+    
     image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
@@ -26,20 +28,17 @@ const buildImage = (blobUrl) => {
 
         const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width)
     
-        const leftPixels = getLeftPixels(imageMatrix,10)
+        const leftPixels = getLeftPixels(imageMatrix,AMBIENT_SIZE)
 
-        const rightPixels = getRightPixels(imageMatrix,10)
+        const rightPixels = getRightPixels(imageMatrix,AMBIENT_SIZE)
 
-        const quatizationColors = medianCutQuantization(rightPixels, 0);
+        const quatizationColorsRight = medianCutQuantization(rightPixels, 0);
+        const quatizationColorsLeft = medianCutQuantization(leftPixels, 0);
 
+        createAmbienteMode(quatizationColorsLeft,box);
+        createAmbienteMode(quatizationColorsRight, boxTwo)
         
-        quatizationColors.forEach(color=>{
-            const div = document.createElement("div");
-            div.style.width = "10px";
-            div.style.height = "2.2px";
-            div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},.7)`
-            boxTwo.appendChild(div);
-        })
+        
 
     }
     image.src = blobUrl
@@ -176,6 +175,46 @@ const getRightPixels = (imageMatrix, numPixels) => {
         }
     }
     return pixels;
+}
+/*
+const getBottomtPixels = (imageMatrix, numPixels) => {
+    const pixels = [];
+    for(let i = 0; i < imageMatrix.length; i++){
+        for(let j = 0; j < numPixels; j++){
+            pixels.push(imageMatrix[i][j])
+        }
+    }
+    return pixels;
+}
+
+const getUpPixels = (imageMatrix, numPixels) => {
+    const pixels = [];
+    for(let i = 0; i < imageMatrix.length; i++){
+        for(let j = 0; j < imageMatrix[i].length; j++){
+            
+            if(j > imageMatrix[i].length - numPixels){
+                pixels.push(imageMatrix[i][j])
+            }
+        }
+    }
+    return pixels;
+}
+*/
+/**
+ * 
+ * @param {Array} colors 
+ * @param {HTMLElement} mainElement 
+ */
+
+const createAmbienteMode = (colors, mainElement) => {
+    colors.forEach(color=>{
+        const div = document.createElement("div");
+        div.style.width = `180px`;
+        div.style.height = "3.2px";
+        div.style.backgroundColor = `rgba(${color.r},${color.g},${color.b},.2)`
+        mainElement.appendChild(div);
+    })
+
 }
 
 (async()=>{
