@@ -217,7 +217,6 @@ const createAmbienteMode = (colors, mainElement,direction) => {
         const g = Math.min(255, color.g + lightenFactor);
         const b = Math.min(255, color.b + lightenFactor);
 
-  // Create the second color using the modified RGB values
         const color2 = `rgba(${r}, ${g}, ${b},0.06486344537815125)`;
         const gradientBacckground = `linear-gradient(${directionGradient}, ${color1} 0%, ${color2} 100%)`
         div.style.width = `180px`;
