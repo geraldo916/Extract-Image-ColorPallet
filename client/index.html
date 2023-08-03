@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Metamorph Image</title>
 </head>
-<body  >
-    <main style="height: 100vh;" >
-        <section class="area">
-            <div class="container">
-                <div class="image-container" style="display: flex;justify-content: center;" >
-                    <div id="box"></div>
-                    <div id="image" >
-                        <canvas id="canvas" ></canvas>
+<body>
+    <div id="ambient-mode" >
+        <main>
+            <section class="area" >
+                <div class="container">
+                    <div class="image-container" >
+                        <div>
+                            <canvas id="canvas" ></canvas>
+                        </div>
+                        <div>
+                            <div id="pallete"></div>
+                        </div>
                     </div>
-                    <div id="boxTwo" ></div>
                 </div>
                 
-            </div>
-            <div id="pallete" style="display: flex;" >
-
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
     <script src="pako.min.js"></script>
     <script src="index.js"></script>
 </body>

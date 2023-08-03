@@ -1,9 +1,10 @@
 const URL_API = 'http://localhost:8080';
 const imageContainer = document.getElementById('image');
-const box = document.getElementById('box')
-const boxTwo = document.getElementById('boxTwo')
-const pallet = document.getElementById("pallete")
+const box = document.getElementById('box');
+const boxTwo = document.getElementById('boxTwo');
+const pallet = document.getElementById("pallete");
 const AMBIENT_SIZE = 40
+let totalVariantColors = []
 
 async function fetchImage(){
     const data = await fetch(URL_API);
@@ -26,22 +27,15 @@ const buildImage = (blobUrl) => {
 
         const rgbaColors = extractImageColors(imageData.data);
 
-        const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width)
-    
-        const leftPixels = getLeftPixels(imageMatrix,AMBIENT_SIZE)
+        const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width);
 
-        const rightPixels = getRightPixels(imageMatrix,AMBIENT_SIZE)
+        const pallet = extractPalletColorXY(imageMatrix,0,522,0,900)
 
-        const pallet = extractPalletColorXY(imageMatrix,400,520,0,10)
-
-        const quatizationColorsRight = medianCutQuantization(rightPixels, 0,8);
-        const quatizationColorsLeft = medianCutQuantization(leftPixels, 0,8);
         const quantizationPallet = medianCutQuantization(pallet,0,4);
+        const palletColors = generatePallet(quantizationPallet);
 
-        createAmbienteMode(quatizationColorsLeft,box,"to left");
-        createAmbienteMode(quatizationColorsRight,boxTwo,"to right");
-        generatePallet(quantizationPallet);
-
+        const color = createAmbienteMode(quantizationPallet);
+        document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
     }
     image.src = blobUrl
 }
@@ -169,48 +163,29 @@ const transformImageInto2dMatrix = (colorArray,imageWidth) => {
     return imageMatrix
 }
 
-const getLeftPixels = (imageMatrix, numPixels) => {
-    const pixels = [];
-    for(let i = 0; i < imageMatrix.length; i++){
-        for(let j = 0; j < numPixels; j++){
-            pixels.push(imageMatrix[i][j])
-        }
-    }
-    return pixels;
-}
-
-const getRightPixels = (imageMatrix, numPixels) => {
-    const pixels = [];
-    for(let i = 0; i < imageMatrix.length; i++){
-        for(let j = 0; j < imageMatrix[i].length; j++){
-            
-            if(j > imageMatrix[i].length - numPixels){
-                pixels.push(imageMatrix[i][j])
-            }
-        }
-    }
-    return pixels;
-}
-
 const generatePallet = (pixels) => {
+    const realPallet = [];
     for(let index = 0; index < pixels.length; index++){
+
         if(index > 0){
-            const diff = calculateColorDistance(pixels[index], pixels[index - 1])
-            if(diff < 200){
+            const diff = calculateColorDistance(pixels[index], pixels[index - 1]);
+            if(diff < 120){
                 continue;
             }
         }
+        
         if(pixels[index].r){
-            
             const div = document.createElement("div");
             const background = `rgba(${pixels[index].r},${pixels[index].g},${pixels[index].b},1)`;
             div.style.width = `100px`;
             div.style.height = "100px";
             div.style.backgroundColor = background;
             pallet.appendChild(div);
+            realPallet.push(pixels[index])
         }
         
     }
+    return realPallet;
 }
 
 const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
@@ -228,32 +203,23 @@ const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
 }
 
 /**
- * 
  * @param {Array} colors 
  * @param {HTMLElement} mainElement 
  */
 
-const createAmbienteMode = (colors, mainElement,direction) => {
-    const directionGradient = direction;
-    colors.forEach(color=>{
-        const div = document.createElement("div");
-        const color1 = `rgba(${color.r},${color.g},${color.b},1)`;
-
-        const lightenFactor = 100;
-        const r = Math.min(255, color.r + lightenFactor);
-        const g = Math.min(255, color.g + lightenFactor);
-        const b = Math.min(255, color.b + lightenFactor);
-
-        const color2 = `rgba(${r}, ${g}, ${b},0.06486344537815125)`;
-        const gradientBacckground = `linear-gradient(${directionGradient}, ${color1} 0%, ${color2} 100%)`
-        div.style.width = `180px`;
-        div.style.height = "2.2px";
-        div.style.background = gradientBacckground;
-        mainElement.appendChild(div);
-    })
-
+const createAmbienteMode = (colors) => {
+    for(let j = 0; j < colors.length; j++){
+        if( j > 0){
+            const diff = calculateColorDistance(colors[j], colors[j-1]);
+            if(diff < 4095){
+                continue;
+            }
+            totalVariantColors.push(colors[j])
+        }
+    }
+    return totalVariantColors[1];
 }
 
 (async()=>{
-    await fetchImage()
+    await fetchImage();
 })()
