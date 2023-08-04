@@ -31,7 +31,7 @@ const buildImage = (blobUrl) => {
 
         const pallet = extractPalletColorXY(imageMatrix,0,522,0,900)
 
-        const quantizationPallet = medianCutQuantization(pallet,0,4);
+        const quantizationPallet = medianCutQuantization(pallet,0,8);
         const palletColors = generatePallet(quantizationPallet);
 
         const color = createAmbienteMode(quantizationPallet);
@@ -88,7 +88,7 @@ const medianCutQuantization = (rgbaColors, depth, colorDepth) => {
     }
 
     const biggestChannelRange = getBiggestChannelRange(rgbaColors);
-    rgbaColors.sort((p1,p2) => p1[biggestChannelRange] - p2[biggestChannelRange]);
+    rgbaColors.sort((p1,p2) => p2[biggestChannelRange] - p1[biggestChannelRange]);
 
     const mid = rgbaColors.length / 2;
     return [
@@ -169,7 +169,7 @@ const generatePallet = (pixels) => {
 
         if(index > 0){
             const diff = calculateColorDistance(pixels[index], pixels[index - 1]);
-            if(diff < 120){
+            if(diff < 4094){
                 continue;
             }
         }
@@ -177,8 +177,8 @@ const generatePallet = (pixels) => {
         if(pixels[index].r){
             const div = document.createElement("div");
             const background = `rgba(${pixels[index].r},${pixels[index].g},${pixels[index].b},1)`;
-            div.style.width = `100px`;
-            div.style.height = "100px";
+            div.style.width = `120px`;
+            div.style.height = "120px";
             div.style.backgroundColor = background;
             pallet.appendChild(div);
             realPallet.push(pixels[index])
@@ -211,7 +211,7 @@ const createAmbienteMode = (colors) => {
     for(let j = 0; j < colors.length; j++){
         if( j > 0){
             const diff = calculateColorDistance(colors[j], colors[j-1]);
-            if(diff < 4095){
+            if(diff < 4094){
                 continue;
             }
             totalVariantColors.push(colors[j])
