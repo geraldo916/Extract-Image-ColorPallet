@@ -10,9 +10,15 @@
     <div id="ambient-mode" >
         <section class="area" >
             <div class="container">
-                <div class="image-container" >
+                <div class="image-container" id="box" >
                     <div class="canvas-cotainer" >
-                        <canvas id="canvas" ></canvas>
+                        <div id="crop-box" class="crop-box">
+                            <span class="point point-right point-right-up"></span>
+                            <span class="point point-right point-right-down"></span>
+                            <span class="point point-left point-left-up"></span>
+                            <span class="point point-left point-left-down"></span>
+                        </div>
+                        <canvas id="canvas"></canvas>
                     </div>
                 </div>
                 <div class="pallete-container" >
