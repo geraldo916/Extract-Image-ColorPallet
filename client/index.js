@@ -18,6 +18,7 @@ const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
     const image = new Image();
     const crop = new Cropper();
+    crop.moveCropBox()
 
     image.onload = () => {
         canvas.width = image.width;

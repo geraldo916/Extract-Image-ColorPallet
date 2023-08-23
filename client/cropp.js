@@ -16,7 +16,6 @@ class Cropper{
     }
 
     getCoordenates(){
-        console.log(cropBox.offsetWidth,cropBox.offsetLeft)
         return {
             startX:this.startX,
             startY:this.startY,
@@ -24,4 +23,34 @@ class Cropper{
             endY: this.endY
         }
     }
+
+    moveCropBox(){
+        let startX = 0;
+        let startY = 0;
+        cropBox.addEventListener('mousedown',(e)=>{
+            this.mouseState = 'move';
+            startX = e.clientX;
+            startY = e.clientY;
+        })
+        
+        boxContainer.addEventListener('mousemove',(e)=>{
+            if(this.mouseState === 'move'){
+                let movedPixelsX = e.clientX;
+                let movedPixelsY = e.clientY;
+                let pixelToMoveX = movedPixelsX - startX;
+                let pixelToMoveY = movedPixelsY - startY;
+                if(pixelToMoveX != 0){
+                    cropBox.style.transform = `translateX(${pixelToMoveX}px)`
+                }
+            }
+        })
+
+        boxContainer.addEventListener('mouseup',(e)=>{
+            this.mouseState = 'not drawing'
+            console.log("Not Drawing")
+        })
+
+    }
+
+
 }
