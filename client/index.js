@@ -4,24 +4,7 @@ const box = document.getElementById('box');
 const boxTwo = document.getElementById('boxTwo');
 const pallet = document.getElementById("pallete");
 const AMBIENT_SIZE = 40
-const cropBox = document.getElementById('crop-box');
 let totalVariantColors = []
-
-cropBox.onpointerdown = function(e){
-    console.log("Clicked")
-    box.addEventListener('mousemove',function(e){
-        console.log("Add")
-    })
-    box.removeEventListener('mousemove',function(e){
-        console.log("removed")
-    })
-}
-/*
-console.log("Mouse Oving")
-cropBox.onmouseup = function(e){
-    console.log("Mouse up")
-}*/
-
 
 
 async function fetchImage(){
@@ -34,12 +17,16 @@ async function fetchImage(){
 const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
     const image = new Image();
-    
+    const crop = new Cropper();
+
     image.onload = () => {
         canvas.width = image.width;
+        console.log(canvas.width)
         canvas.height = image.height;
+        const coords = crop.getCoordenates();
         const context = canvas.getContext("2d");
         context.drawImage(image,0, 0)
+        console.log(coords)
 
         const imageData = context.getImageData(0,0, image.width, image.height);
 
@@ -47,7 +34,7 @@ const buildImage = (blobUrl) => {
 
         const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width);
 
-        const pallet = extractPalletColorXY(imageMatrix,0,4,0,900)
+        const pallet = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
 
         const quantizationPallet = medianCutQuantization(pallet,0,8);
         const palletColors = generatePallet(quantizationPallet);
