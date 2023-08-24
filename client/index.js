@@ -3,6 +3,7 @@ const imageContainer = document.getElementById('image');
 const box = document.getElementById('box');
 const boxTwo = document.getElementById('boxTwo');
 const pallet = document.getElementById("pallete");
+const cropLimitator = document.getElementById("crop-limitator");
 const AMBIENT_SIZE = 40
 let totalVariantColors = []
 
@@ -16,24 +17,51 @@ async function fetchImage(){
 
 const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
     const image = new Image();
     const crop = new Cropper();
     crop.moveCropBox()
 
     image.onload = () => {
-        canvas.width = image.width;
-        console.log(canvas.width)
-        canvas.height = image.height;
+        
+        const imageAspectRatio = image.width / image.height;
+        const canvasAspectRatio = canvas.width / canvas.height;
+        let drawWidth, drawHeight;
+        
+        if(imageAspectRatio > canvasAspectRatio){
+            drawWidth = canvas.width;
+            drawHeight = canvas.width / imageAspectRatio;
+        }else{
+            drawHeight = canvas.height;
+            drawWidth = canvas.height * imageAspectRatio;
+        }
+
+        const drawX = (canvas.width - drawWidth) / 2;
+        const drawY = (canvas.height - drawHeight) / 2;
+
+        image.width = drawWidth;
+        image.height = drawHeight;
+        cropLimitator.style.width = drawWidth+"px";
+        cropLimitator.style.height = drawHeight+"px";
+
+        cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
+        //context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, drawX, drawY, image.width, image.height);
+
         const coords = crop.getCoordenates();
-        const context = canvas.getContext("2d");
-        context.drawImage(image,0, 0)
+        
         console.log(coords)
 
-        const imageData = context.getImageData(0,0, image.width, image.height);
+        console.log("Canvas Width and Height:",canvas.width, canvas.height);
+        console.log("Image Width and Height:",image.width,image.height);
+        console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
+        console.log("Draw coordenates:",Math.round(drawX),Math.round(drawY));
+
+        const imageData = context.getImageData(drawX,drawY, image.width, image.height);
 
         const rgbaColors = extractImageColors(imageData.data);
 
-        const imageMatrix = transformImageInto2dMatrix(rgbaColors,canvas.width);
+        const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
 
         const pallet = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
 
@@ -223,7 +251,12 @@ const createAmbienteMode = (colors) => {
             totalVariantColors.push(colors[j])
         }
     }
-    return totalVariantColors[1];
+    
+    if(totalVariantColors.length === 1){
+        return totalVariantColors[0];
+    }
+    return totalVariantColors[1]
+    
 }
 
 (async()=>{
