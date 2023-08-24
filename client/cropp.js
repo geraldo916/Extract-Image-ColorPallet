@@ -9,15 +9,19 @@ class Cropper{
     endY;
     width;
     height;
-    constructor(){
+    cropBoxLeftBounding;
+    cropBoxTopBounding;
+    constructor(parentLeft, parentTop){
+        this.cropBoxLeftBounding = Math.round(cropBox.getBoundingClientRect().left);
+        this.cropBoxTopBounding = Math.round(cropBox.getBoundingClientRect().top);
         this.mouseState = null;
-        console.log(cropBox.offsetLeft)
-        this.startX = cropBox.offsetLeft;
-        this.startY = cropBox.offsetTop;
-        this.endX = cropBox.offsetWidth + cropBox.offsetLeft;
-        this.endY = cropBox.offsetHeight + cropBox.offsetTop;
+        this.startX = this.cropBoxLeftBounding - parentLeft;
+        this.startY = this.cropBoxTopBounding - parentTop;
+        this.endX = cropBox.offsetWidth + this.startX;
+        this.endY = cropBox.offsetHeight + this.startY;
         this.width = cropBox.clientWidth;
         this.height = cropBox.clientHeight;
+        console.log("Crop Left - Top:",this.startX,this.startY);
     }
 
     /**
@@ -53,8 +57,8 @@ class Cropper{
                 pixelToMoveX = movedPixelsX - startX;
                 pixelToMoveY = movedPixelsY - startY;
 
-                if(pixelToMoveX != 0){
-                    cropBox.style.transform = `translateX(${pixelToMoveX}px)`
+                if(pixelToMoveX != 0 || pixelToMoveY != 0){
+                    cropBox.style.transform = `translateX(${pixelToMoveX}px) translateY(${pixelToMoveY}px)`
                 }
             }
         })

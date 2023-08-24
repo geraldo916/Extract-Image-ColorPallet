@@ -19,8 +19,6 @@ const buildImage = (blobUrl) => {
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
     const image = new Image();
-    const crop = new Cropper();
-    crop.moveCropBox()
 
     image.onload = () => {
         
@@ -47,15 +45,30 @@ const buildImage = (blobUrl) => {
         cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
         //context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, drawX, drawY, image.width, image.height);
+        const imageContainerLeft = cropLimitator.getBoundingClientRect().left;
+        const imageContainerTop = cropLimitator.getBoundingClientRect().top;
 
-        const coords = crop.getCoordenates();
         
+        const crop = new Cropper(Math.round(imageContainerLeft),Math.round(imageContainerTop));
+        crop.moveCropBox()
+        const coords = crop.getCoordenates();
         console.log(coords)
+        /*
+            export function getOffset(element) {
+                const box = element.getBoundingClientRect();
+
+                return {
+                    left: box.left + (window.pageXOffset - document.documentElement.clientLeft),
+                    top: box.top + (window.pageYOffset - document.documentElement.clientTop),
+                };
+                }
+        */
 
         console.log("Canvas Width and Height:",canvas.width, canvas.height);
         console.log("Image Width and Height:",image.width,image.height);
         console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
-        console.log("Draw coordenates:",Math.round(drawX),Math.round(drawY));
+        console.log("Draw coordenates:",drawX,drawY);
+        console.log("Crop Limitator Left - Top;",imageContainerLeft,imageContainerTop);
 
         const imageData = context.getImageData(drawX,drawY, image.width, image.height);
 
