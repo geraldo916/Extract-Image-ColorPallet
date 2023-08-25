@@ -1,5 +1,6 @@
 const cropBox = document.getElementById('crop-box');
 const boxContainer = document.getElementById('crop-limitator');
+const cropIntern = document.getElementById('crop-intern')
 
 class Cropper{
     mouseState;
@@ -68,7 +69,7 @@ class Cropper{
         let pixelToMoveX = 0;
         let pixelToMoveY = 0;
 
-        cropBox.addEventListener('mousedown',(e)=>{
+        cropIntern.addEventListener('mousedown',(e)=>{
             startX = e.clientX;
             startY = e.clientY;
             this.mouseState = 'move';
@@ -94,7 +95,38 @@ class Cropper{
             this.startY = coords.startY;
             this.endX = coords.endX;
             this.endY = coords.endY;
-            
+        })
+
+    }
+
+    resizeCropBox(){
+        const rightPoint = document.getElementById("point-right-up");
+        let startX = 0;
+        let startY = 0;
+        let pixelToMoveX = 0;
+        let pixelToMoveY = 0;
+
+        rightPoint.addEventListener('mousedown',(e)=>{
+            startX = e.clientX;
+            startY = e.clientY;
+            this.mouseState = 'resize';
+        })
+
+        boxContainer.addEventListener('mousemove',(e)=>{
+            if(this.mouseState === 'resize'){
+                pixelToMoveX = e.clientX - startX;
+                pixelToMoveY = e.clientY - startY;
+                let pixelWidth = (((pixelToMoveX * 100) / this.width) / 100) * this.width;
+                let pixelHeight = (((pixelToMoveY * 100) / this.height) / 100) * this.height;
+                console.log(pixelToMoveY)
+                cropBox.style.width = `${this.width+pixelWidth}px`;
+                cropBox.style.height = `${(this.height+pixelHeight)}px`;
+
+            }
+        })
+
+        window.addEventListener('mouseup',(e)=>{
+            this.mouseState = 'not resizing';
         })
 
     }

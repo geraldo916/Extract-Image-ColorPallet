@@ -51,7 +51,10 @@ const buildImage = (blobUrl) => {
         const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
         
         const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
-        crop.moveCropBox()
+        crop.resizeCropBox();
+        crop.moveCropBox();
+        
+
         const coords = crop.getCoordenates();
         console.log("Canvas Width and Height:",canvas.width, canvas.height);
         console.log("Image Width and Height:",image.width,image.height);
