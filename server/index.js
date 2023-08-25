@@ -1,7 +1,7 @@
 import http, { createServer } from 'http';
 import { createReadStream } from 'fs';
 
-const imagePath = '../image/spyder.png';
+const imagePath = '../image/sd.png';
 //const imageStream = createReadStream(imagePath);
 
 /**

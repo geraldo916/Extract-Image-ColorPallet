@@ -2,8 +2,8 @@ const cropBox = document.getElementById('crop-box');
 const boxContainer = document.getElementById('crop-limitator');
 
 class Cropper{
-    mouseState = null;
-    startX ;
+    mouseState;
+    startX;
     startY;
     endX;
     endY;
@@ -13,14 +13,20 @@ class Cropper{
     cropBoxTopBounding;
     parentLeft;
     parentTop;
-    constructor(parentLeft, parentTop){
+    parentWidth;
+    parentHeight;
+    constructor(parentLeft, parentTop,parentWidth,parentHeight){
+        this.mouseState = null;
         this.parentLeft = parentLeft;
         this.parentTop = parentTop;
-        this.mouseState = null;
+        this.parentWidth = parentWidth;
+        this.parentHeight = parentHeight;
         this.cropBoxLeftBounding = Math.round(cropBox.getBoundingClientRect().left);
         this.cropBoxTopBounding = Math.round(cropBox.getBoundingClientRect().top);
         this.startX = this.cropBoxLeftBounding - this.parentLeft;
         this.startY = this.cropBoxTopBounding - this.parentTop;
+        this.width = cropBox.clientWidth;
+        this.height = cropBox.clientHeight;
         this.endX = cropBox.offsetWidth + this.startX;
         this.endY = cropBox.offsetHeight + this.startY;
     }
@@ -63,7 +69,6 @@ class Cropper{
         let pixelToMoveY = 0;
 
         cropBox.addEventListener('mousedown',(e)=>{
-
             startX = e.clientX;
             startY = e.clientY;
             this.mouseState = 'move';
@@ -72,16 +77,17 @@ class Cropper{
         boxContainer.addEventListener('mousemove',(e)=>{
             if(this.mouseState === 'move'){
                 let coords = this.getInicialCoords();
-                pixelToMoveX = e.clientX - startX;
-                pixelToMoveY = e.clientY - startY;
-
-                if(pixelToMoveX != 0 || pixelToMoveY != 0){
-                    cropBox.style.transform = `translateX(${pixelToMoveX+coords.startX}px) translateY(${pixelToMoveY+coords.startY}px)`
+                pixelToMoveX = e.clientX - startX + coords.startX;
+                pixelToMoveY = e.clientY - startY + coords.startY;
+                
+                if(pixelToMoveX >= 0 || pixelToMoveY >= 0){
+                    cropBox.style.transform = `translateX(
+                        ${pixelToMoveX < 0 ? 0 : pixelToMoveX+this.width-2 < this.parentWidth ? pixelToMoveX: this.parentWidth-this.width-2}px) translateY(${pixelToMoveY < 0 ? 0 : pixelToMoveY+this.height-2 < this.parentHeight?pixelToMoveY:this.parentHeight-this.height}px)`
                 }
             }
         })
 
-        boxContainer.addEventListener('mouseup',(e)=>{
+        window.addEventListener('mouseup',(e)=>{
             this.mouseState = 'not drawing';
             let coords = this.getCoordenates();
             this.startX = coords.startX;

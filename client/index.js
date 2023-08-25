@@ -45,25 +45,14 @@ const buildImage = (blobUrl) => {
         cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
         //context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(image, drawX, drawY, image.width, image.height);
-        const imageContainerLeft = cropLimitator.getBoundingClientRect().left;
-        const imageContainerTop = cropLimitator.getBoundingClientRect().top;
-
+        const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
+        const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
+        const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
+        const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
         
-        const crop = new Cropper(Math.round(imageContainerLeft),Math.round(imageContainerTop));
+        const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
         crop.moveCropBox()
         const coords = crop.getCoordenates();
-        console.log(coords)
-        /*
-            export function getOffset(element) {
-                const box = element.getBoundingClientRect();
-
-                return {
-                    left: box.left + (window.pageXOffset - document.documentElement.clientLeft),
-                    top: box.top + (window.pageYOffset - document.documentElement.clientTop),
-                };
-                }
-        */
-
         console.log("Canvas Width and Height:",canvas.width, canvas.height);
         console.log("Image Width and Height:",image.width,image.height);
         console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
