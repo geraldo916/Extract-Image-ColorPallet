@@ -62,7 +62,6 @@ body{
     position: relative;
 }
 .canvas-cotainer .crop-box{
-    width: 40%;
     height: 150px;
     position: relative;
     border: 4px solid #fff;

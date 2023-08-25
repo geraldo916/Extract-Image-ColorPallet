@@ -71,7 +71,7 @@ const buildImage = (blobUrl) => {
         const pallet = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
 
         const quantizationPallet = medianCutQuantization(pallet,0,8);
-        const palletColors = generatePallet(quantizationPallet);
+        generatePallet(quantizationPallet);
 
         const color = createAmbienteMode(quantizationPallet);
         document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`

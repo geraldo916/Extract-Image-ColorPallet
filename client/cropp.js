@@ -17,6 +17,7 @@ class Cropper{
     parentWidth;
     parentHeight;
     constructor(parentLeft, parentTop,parentWidth,parentHeight){
+        cropBox.style.width = '140px'
         this.mouseState = null;
         this.parentLeft = parentLeft;
         this.parentTop = parentTop;
@@ -46,8 +47,8 @@ class Cropper{
         return {
             startX: inicialstartX,
             startY: inicialstartY,
-            endX:  inicialendX,
-            endY:  inicialendY
+            endX: inicialendX,
+            endY: inicialendY,
         }
     }
 
@@ -59,7 +60,9 @@ class Cropper{
             startX: this.startX,
             startY: this.startY,
             endX:  this.endX,
-            endY:  this.endY
+            endY:  this.endY,
+            width: this.width,
+            height: this.height
         }
     }
 
@@ -105,7 +108,7 @@ class Cropper{
         let startY = 0;
         let pixelToMoveX = 0;
         let pixelToMoveY = 0;
-
+        let atualWidth = 0;
         rightPoint.addEventListener('mousedown',(e)=>{
             startX = e.clientX;
             startY = e.clientY;
@@ -113,20 +116,24 @@ class Cropper{
         })
 
         boxContainer.addEventListener('mousemove',(e)=>{
+
             if(this.mouseState === 'resize'){
                 pixelToMoveX = e.clientX - startX;
                 pixelToMoveY = e.clientY - startY;
+               
                 let pixelWidth = (((pixelToMoveX * 100) / this.width) / 100) * this.width;
                 let pixelHeight = (((pixelToMoveY * 100) / this.height) / 100) * this.height;
-                console.log(pixelToMoveY)
-                cropBox.style.width = `${this.width+pixelWidth}px`;
+                
+                cropBox.style.width = `${this.width + pixelWidth}px`;
                 cropBox.style.height = `${(this.height+pixelHeight)}px`;
-
+                
             }
         })
 
         window.addEventListener('mouseup',(e)=>{
             this.mouseState = 'not resizing';
+            this.width = cropBox.offsetWidth;
+            this.height = cropBox.offsetHeight;
         })
 
     }
