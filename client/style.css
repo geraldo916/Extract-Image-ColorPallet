@@ -66,11 +66,10 @@ body{
     width: 80px;
     height: 150px;
     position: relative;
-    border: 1px solid #fff;
+    border: 3px solid #fff;
     background-color: #01040957;
     cursor: move;
     transition: transform ease;
-    transform: translateX(480px) translateY(0px);
 }
 .point{
     background-color: #fff;
