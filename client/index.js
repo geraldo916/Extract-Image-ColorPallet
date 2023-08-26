@@ -4,9 +4,10 @@ const box = document.getElementById('box');
 const boxTwo = document.getElementById('boxTwo');
 const pallet = document.getElementById("pallete");
 const cropLimitator = document.getElementById("crop-limitator");
+const createPalleteBtn = document.getElementById("create-pallet");
 const AMBIENT_SIZE = 40
 let totalVariantColors = []
-
+let realPallet = [];
 
 async function fetchImage(){
     const data = await fetch(URL_API);
@@ -49,32 +50,43 @@ const buildImage = (blobUrl) => {
         const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
         const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
         const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
-        
         const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
         crop.resizeCropBox();
         crop.moveCropBox();
         
 
-        const coords = crop.getCoordenates();
+        
         console.log("Canvas Width and Height:",canvas.width, canvas.height);
         console.log("Image Width and Height:",image.width,image.height);
         console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
         console.log("Draw coordenates:",drawX,drawY);
         console.log("Crop Limitator Left - Top;",imageContainerLeft,imageContainerTop);
 
-        const imageData = context.getImageData(drawX,drawY, image.width, image.height);
+        createPalleteBtn.onclick = (e) =>{
+            totalVariantColors = []
+            realPallet = []
+            const colorsPalete = document.querySelectorAll('.color-item');
+            colorsPalete.forEach(item=>{
+                item.remove()
+            })
+            
+            const coords = crop.getCoordenates();
+            const imageData = context.getImageData(drawX,drawY, image.width, image.height);
 
-        const rgbaColors = extractImageColors(imageData.data);
+            const rgbaColors = extractImageColors(imageData.data);
 
-        const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
+            const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
 
-        const pallet = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
+            const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
 
-        const quantizationPallet = medianCutQuantization(pallet,0,8);
-        generatePallet(quantizationPallet);
+            const quantizationPallet = medianCutQuantization(pallete,0,8);
+            generatePallet(quantizationPallet);
 
-        const color = createAmbienteMode(quantizationPallet);
-        document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
+            const color = createAmbienteMode(quantizationPallet);
+            document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
+        }
+
+        
     }
     image.src = blobUrl
 }
@@ -203,7 +215,6 @@ const transformImageInto2dMatrix = (colorArray,imageWidth) => {
 }
 
 const generatePallet = (pixels) => {
-    const realPallet = [];
     for(let index = 0; index < pixels.length; index++){
 
         if(index > 0){
@@ -215,6 +226,7 @@ const generatePallet = (pixels) => {
         
         if(pixels[index].r){
             const div = document.createElement("div");
+            div.classList.add("color-item")
             const background = `rgba(${pixels[index].r},${pixels[index].g},${pixels[index].b},1)`;
             div.style.width = `120px`;
             div.style.height = "120px";
