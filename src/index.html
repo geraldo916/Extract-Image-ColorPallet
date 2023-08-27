@@ -18,34 +18,34 @@
                                 <span id="point-right-up" class="point point-right point-right-down"></span>
                             </div>
                         </div>
-                        <canvas width="800" height="400"  id="canvas"></canvas>
+                        <canvas width="600" height="360"  id="canvas"></canvas>
                         <div class="tool-boxs">
                             <div class="tool-btns">
+                                <label for="image-file" class="custom-file-input">Choose a File</label>
+                                <input type="file" class="file-input" id="image-file" accept="image/*">
+                                <br><br>
+                                <button onclick="buildImage()" >Load Image</button><br><br>
                                 <button id="create-pallet">Generate Pallete</button>
-                                <form action="#" method="get">
-                                    <input type="file" name="image-file" id="image-file" accept="image/*">
-                                    <input type="button" value="Load Button" onclick="loadImage()">
-                                </form>
                             </div>
                             <div class="viewbox-info" >
                                 <div class="viewbox-info-item" >
                                     <div class="info-box">
                                         <span class="info-value" id="width-inf">0</span>
-                                        <span class="label-info" >Image-Width</span>
+                                        <span class="label-info" >Image Width</span>
                                     </div>
                                     <div class="info-box">
                                         <span class="info-value" id="height-inf">0</span>
-                                        <span class="label-info" >Image-Height</span>
+                                        <span class="label-info" >Image Height</span>
                                     </div>
                                 </div>
                                 <div class="viewbox-info-item" >
                                     <div class="info-box">
                                         <span class="info-value" id="x-info">0</span>
-                                        <span class="label-info" >Image-X</span>
+                                        <span class="label-info" >Image X</span>
                                     </div>
                                     <div class="info-box">
                                         <span class="info-value" id="y-info">0</span>
-                                        <span class="label-info" >Image-Y</span>
+                                        <span class="label-info" >Image Y</span>
                                     </div>
                                 </div>
                                 <div class="viewbox-info-item" >

@@ -15,12 +15,30 @@ section{
 body{
     background-color: #010409;
     overflow-x: hidden;
-
+    overflow-y: hidden;
 }
+
 .container{
     padding: 20px;
     display: flex;
     justify-content: space-around;
+}
+.file-input {
+    display: none;
+}
+
+.custom-file-input {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.custom-file-input:hover {
+    background-color: #2980b9;
 }
 .image-container{
     display: flex;
@@ -28,20 +46,22 @@ body{
     background-color: #01040963;
     border-radius: 6px;
     padding: 20px;
-    width: 850px;
+    width: 740px;
 }
 #pallete{
     display: grid;
-    grid-template-columns: repeat(4,4fr);
+    grid-template-columns: repeat(3,3fr);
+    margin-bottom: 30px;
 }
 .pallete-container{
     background-color: #01040963;
     padding: 20px;
     display: flex;
     height: 300px;
-    width: 600px;
+    width: 400px;
     border-radius: 6px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 .area{
     box-sizing: border-box;
@@ -110,7 +130,7 @@ body{
 .tool-boxs{
     display: flex;
     justify-content: space-around;
-    margin-top: 16px;
+    margin-top: 4px;
 }
 .tool-btns{
     margin-top: 10px;
@@ -148,6 +168,7 @@ body{
 .label-info{
     padding: 10px;
     background-color: #010409ce;
-    font-weight: 800;
+    font-weight: 500;
     letter-spacing: .001rem;
+    font-size: 0.8rem;
 }
