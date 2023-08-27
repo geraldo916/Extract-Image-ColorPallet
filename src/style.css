@@ -67,6 +67,12 @@ body{
     box-sizing: border-box;
     height: 100vh;
 }
+.color-item{
+    color:#010409;
+    text-align: center;
+    padding-top: 20px;
+    text-transform: uppercase;
+}
 .ambient-mode{
     box-sizing: border-box;
     width: 100%;
@@ -127,6 +133,10 @@ body{
 .viewbox-info{
     display: flex;
 }
+.viewbox-info-item{
+    display: flex;
+    margin-left: 30px;
+}
 .tool-boxs{
     display: flex;
     justify-content: space-around;
@@ -137,8 +147,8 @@ body{
 }
 .tool-boxs button{
     border: none;
-    height: 40px;
-    width: 180px;
+    height: 35px;
+    width: 160px;
     margin-right: 6px;
     border-radius: 6px;
     font-size: 1rem;

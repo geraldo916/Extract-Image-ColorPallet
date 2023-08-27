@@ -4,12 +4,20 @@ const boxTwo = document.getElementById('boxTwo');
 const pallet = document.getElementById("pallete");
 const cropLimitator = document.getElementById("crop-limitator");
 const createPalleteBtn = document.getElementById("create-pallet");
+const imgWidth = document.getElementById("width-inf");
+const imgHeight = document.getElementById("height-inf");
+const imgAspectRatio = document.getElementById("ratio-info");
+const imageFile = document.getElementById("image-file")
+
 let totalVariantColors = []
 let realPallet = [];
 
+imageFile.addEventListener('change', (event) => {
+    buildImage();
+  });
+
 const buildImage = () => {
     const canvas = document.getElementById("canvas");
-    const imageFile = document.getElementById("image-file")
     const image = new Image();
     const fileReader = new FileReader();
     const file = imageFile.files[0];
@@ -20,6 +28,10 @@ const buildImage = () => {
             const imageAspectRatio = image.width / image.height;
             const canvasAspectRatio = canvas.width / canvas.height;
             let drawWidth, drawHeight;
+            
+            imgWidth.innerText = image.width;
+            imgHeight.innerText = image.height;
+            imgAspectRatio.innerText = imageAspectRatio.toFixed(1);
             
             if(imageAspectRatio > canvasAspectRatio){
                 drawWidth = canvas.width;
@@ -219,6 +231,8 @@ const generatePallet = (pixels) => {
             div.style.width = `120px`;
             div.style.height = "120px";
             div.style.backgroundColor = background;
+            div.innerText = `#${pixels[index].r.toString("16")}${pixels[index].g.toString("16")}${pixels[index].b.toString("16")}`
+
             pallet.appendChild(div);
             realPallet.push(pixels[index])
         }
