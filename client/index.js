@@ -54,8 +54,6 @@ const buildImage = (blobUrl) => {
         crop.resizeCropBox();
         crop.moveCropBox();
         
-
-        
         console.log("Canvas Width and Height:",canvas.width, canvas.height);
         console.log("Image Width and Height:",image.width,image.height);
         console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
