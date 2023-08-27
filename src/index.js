@@ -1,4 +1,3 @@
-const URL_API = 'http://localhost:8080';
 const imageContainer = document.getElementById('image');
 const box = document.getElementById('box');
 const boxTwo = document.getElementById('boxTwo');
@@ -9,84 +8,85 @@ const AMBIENT_SIZE = 40
 let totalVariantColors = []
 let realPallet = [];
 
-async function fetchImage(){
-    const data = await fetch(URL_API);
-    const blob = await data.blob()
-    const url = URL.createObjectURL(blob);
-    buildImage(url);
+async function loadImage(){
+    buildImage();
 }
 
-const buildImage = (blobUrl) => {
+const buildImage = () => {
     const canvas = document.getElementById("canvas");
+    const imageFile = document.getElementById("image-file")
     const context = canvas.getContext("2d");
     const image = new Image();
-
-    image.onload = () => {
+    const fileReader = new FileReader();
+    const file = imageFile.files[0];
+   
+    fileReader.onload = () => {
+        image.onload = () => {
         
-        const imageAspectRatio = image.width / image.height;
-        const canvasAspectRatio = canvas.width / canvas.height;
-        let drawWidth, drawHeight;
-        
-        if(imageAspectRatio > canvasAspectRatio){
-            drawWidth = canvas.width;
-            drawHeight = canvas.width / imageAspectRatio;
-        }else{
-            drawHeight = canvas.height;
-            drawWidth = canvas.height * imageAspectRatio;
-        }
-
-        const drawX = (canvas.width - drawWidth) / 2;
-        const drawY = (canvas.height - drawHeight) / 2;
-
-        image.width = drawWidth;
-        image.height = drawHeight;
-        cropLimitator.style.width = drawWidth+"px";
-        cropLimitator.style.height = drawHeight+"px";
-
-        cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
-        //context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, drawX, drawY, image.width, image.height);
-        const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
-        const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
-        const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
-        const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
-        const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
-        crop.resizeCropBox();
-        crop.moveCropBox();
-        
-        console.log("Canvas Width and Height:",canvas.width, canvas.height);
-        console.log("Image Width and Height:",image.width,image.height);
-        console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
-        console.log("Draw coordenates:",drawX,drawY);
-        console.log("Crop Limitator Left - Top;",imageContainerLeft,imageContainerTop);
-
-        createPalleteBtn.onclick = (e) =>{
-            totalVariantColors = []
-            realPallet = []
-            const colorsPalete = document.querySelectorAll('.color-item');
-            colorsPalete.forEach(item=>{
-                item.remove()
-            })
+            const imageAspectRatio = image.width / image.height;
+            const canvasAspectRatio = canvas.width / canvas.height;
+            let drawWidth, drawHeight;
             
-            const coords = crop.getCoordenates();
-            const imageData = context.getImageData(drawX,drawY, image.width, image.height);
-
-            const rgbaColors = extractImageColors(imageData.data);
-
-            const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
-
-            const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
-
-            const quantizationPallet = medianCutQuantization(pallete,0,8);
-            generatePallet(quantizationPallet);
-
-            const color = createAmbienteMode(quantizationPallet);
-            document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
+            if(imageAspectRatio > canvasAspectRatio){
+                drawWidth = canvas.width;
+                drawHeight = canvas.width / imageAspectRatio;
+            }else{
+                drawHeight = canvas.height;
+                drawWidth = canvas.height * imageAspectRatio;
+            }
+    
+            const drawX = (canvas.width - drawWidth) / 2;
+            const drawY = (canvas.height - drawHeight) / 2;
+    
+            image.width = drawWidth;
+            image.height = drawHeight;
+            cropLimitator.style.width = drawWidth+"px";
+            cropLimitator.style.height = drawHeight+"px";
+    
+            cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
+            //context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, drawX, drawY, image.width, image.height);
+            const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
+            const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
+            const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
+            const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
+            const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
+            crop.resizeCropBox();
+            crop.moveCropBox();
+            
+            console.log("Canvas Width and Height:",canvas.width, canvas.height);
+            console.log("Image Width and Height:",image.width,image.height);
+            console.log("Draw Width and Height:",Math.round(drawWidth),Math.round(drawHeight));
+            console.log("Draw coordenates:",drawX,drawY);
+            console.log("Crop Limitator Left - Top;",imageContainerLeft,imageContainerTop);
+    
+            createPalleteBtn.onclick = (e) =>{
+                totalVariantColors = []
+                realPallet = []
+                const colorsPalete = document.querySelectorAll('.color-item');
+                colorsPalete.forEach(item=>{
+                    item.remove()
+                })
+                
+                const coords = crop.getCoordenates();
+                const imageData = context.getImageData(drawX,drawY, image.width, image.height);
+    
+                const rgbaColors = extractImageColors(imageData.data);
+    
+                const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
+    
+                const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
+    
+                const quantizationPallet = medianCutQuantization(pallete,0,8);
+                generatePallet(quantizationPallet);
+    
+                const color = createAmbienteMode(quantizationPallet);
+                document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
+            }
         }
-
-        
+        image.src = fileReader.result
     }
-    image.src = blobUrl
+    fileReader.readAsDataURL(file);
 }
 /**
  * 
@@ -274,6 +274,4 @@ const createAmbienteMode = (colors) => {
     
 }
 
-(async()=>{
-    await fetchImage();
-})()
+loadImage()

@@ -106,7 +106,6 @@ body{
 }
 .viewbox-info{
     display: flex;
-    justify-content: center;
 }
 .tool-boxs{
     display: flex;

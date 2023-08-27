@@ -22,9 +22,13 @@
                         <div class="tool-boxs">
                             <div class="tool-btns">
                                 <button id="create-pallet">Generate Pallete</button>
+                                <form action="#" method="get">
+                                    <input type="file" name="image-file" id="image-file" accept="image/*">
+                                    <input type="button" value="Load Button" onclick="loadImage()">
+                                </form>
                             </div>
                             <div class="viewbox-info" >
-                                <div class="viewbox-info-intem" >
+                                <div class="viewbox-info-item" >
                                     <div class="info-box">
                                         <span class="info-value" id="width-inf">0</span>
                                         <span class="label-info" >Image-Width</span>
@@ -34,7 +38,7 @@
                                         <span class="label-info" >Image-Height</span>
                                     </div>
                                 </div>
-                                <div class="viewbox-info-intem" >
+                                <div class="viewbox-info-item" >
                                     <div class="info-box">
                                         <span class="info-value" id="x-info">0</span>
                                         <span class="label-info" >Image-X</span>
@@ -44,7 +48,7 @@
                                         <span class="label-info" >Image-Y</span>
                                     </div>
                                 </div>
-                                <div class="viewbox-info-intem" >
+                                <div class="viewbox-info-item" >
                                     <div class="info-box">
                                         <span class="info-value" id="ratio-info">0</span>
                                         <span class="label-info" >Aspect Ratio</span>

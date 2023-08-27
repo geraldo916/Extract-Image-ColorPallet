@@ -92,8 +92,8 @@ class Cropper{
         })
 
         window.addEventListener('mouseup',(e)=>{
-            this.mouseState = 'not drawing';
             let coords = this.getCoordenates();
+            this.mouseState = 'not drawing';
             this.startX = coords.startX;
             this.startY = coords.startY;
             this.endX = coords.endX;
@@ -108,7 +108,7 @@ class Cropper{
         let startY = 0;
         let pixelToMoveX = 0;
         let pixelToMoveY = 0;
-        let atualWidth = 0;
+
         rightPoint.addEventListener('mousedown',(e)=>{
             startX = e.clientX;
             startY = e.clientY;
@@ -116,7 +116,6 @@ class Cropper{
         })
 
         boxContainer.addEventListener('mousemove',(e)=>{
-
             if(this.mouseState === 'resize'){
                 pixelToMoveX = e.clientX - startX;
                 pixelToMoveY = e.clientY - startY;
