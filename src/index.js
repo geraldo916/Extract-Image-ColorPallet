@@ -17,24 +17,22 @@ let imageSpecification = {
 
 imageFile.addEventListener('change', async (event) => {
     await buildImage();
-    initCrop();
 });
 createPalleteBtn.onclick = () => {
     initCrop();
 }
 
-
-function initCrop(){
+function initCrop(){ 
     const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
     const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
     const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
     const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
 
     const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
-            
+    
+    crop.render();
     crop.resizeCropBox();
     crop.moveCropBox();
-    
 }
 
 async function buildImage(){

@@ -1,6 +1,13 @@
-const cropBox = document.getElementById('crop-box');
+let cropBox = document.getElementById('crop-box');
 const boxContainer = document.getElementById('crop-limitator');
-const cropIntern = document.getElementById('crop-intern')
+let cropIntern = document.getElementById('crop-intern');
+
+const TEMPLATE = `
+    <div id="crop-box" class="crop-box">
+    <span id="crop-intern"></span>
+    <span id="point-right-up" class="point point-right point-right-down"></span>
+    </div>
+`
 
 class Cropper{
     mouseState;
@@ -16,13 +23,21 @@ class Cropper{
     parentTop;
     parentWidth;
     parentHeight;
+    template = TEMPLATE;
     constructor(parentLeft, parentTop,parentWidth,parentHeight){
-        cropBox.style.width = '140px'
         this.mouseState = null;
         this.parentLeft = parentLeft;
         this.parentTop = parentTop;
         this.parentWidth = parentWidth;
         this.parentHeight = parentHeight;
+        
+    }
+
+    render(){
+        boxContainer.innerHTML = this.template;
+        cropBox = document.getElementById('crop-box');
+        cropIntern = document.getElementById('crop-intern');
+        cropBox.style.width = '140px';
         this.cropBoxLeftBounding = Math.round(cropBox.getBoundingClientRect().left);
         this.cropBoxTopBounding = Math.round(cropBox.getBoundingClientRect().top);
         this.startX = this.cropBoxLeftBounding - this.parentLeft;
