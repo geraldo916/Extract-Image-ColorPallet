@@ -17,9 +17,24 @@ let imageSpecification = {
 
 imageFile.addEventListener('change', async (event) => {
     await buildImage();
+    initCrop();
 });
 createPalleteBtn.onclick = () => {
-    init(imageSpecification.imageDrawWidth,imageSpecification.imageRawData);
+    initCrop();
+}
+
+
+function initCrop(){
+    const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
+    const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
+    const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
+    const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
+
+    const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
+            
+    crop.resizeCropBox();
+    crop.moveCropBox();
+    
 }
 
 async function buildImage(){
@@ -72,18 +87,7 @@ async function buildImage(){
  * @param {number} imageWidth 
  * @param {Uint16Array} imageData 
  */
-const init = (imageWidth,imageData) => {
-
-    const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
-    const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
-    const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
-    const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
-
-    const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
-            
-    crop.resizeCropBox();
-    crop.moveCropBox();
-    
+const init = (imageWidth,imageData) => {    
     const colorsPalete = document.querySelectorAll('.color-item');
     totalVariantColors = [];
     realPallet = [];
