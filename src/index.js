@@ -1,6 +1,3 @@
-const imageContainer = document.getElementById('image');
-const box = document.getElementById('box');
-const boxTwo = document.getElementById('boxTwo');
 const pallet = document.getElementById("pallete");
 const cropLimitator = document.getElementById("crop-limitator");
 const createPalleteBtn = document.getElementById("create-pallet");
