@@ -4,88 +4,104 @@ const createPalleteBtn = document.getElementById("create-pallet");
 const imgWidth = document.getElementById("width-inf");
 const imgHeight = document.getElementById("height-inf");
 const imgAspectRatio = document.getElementById("ratio-info");
-const imageFile = document.getElementById("image-file")
-
+const imageFile = document.getElementById("image-file");
 let totalVariantColors = []
 let realPallet = [];
+let imageSpecification = {
+    imageRawData:null,
+    imageDrawWidth: 0,
+    imageDrawHeight: 0,
+    imageDrawX:0,
+    imageDrawY:0
+}
 
-imageFile.addEventListener('change', (event) => {
-    buildImage();
-  });
+imageFile.addEventListener('change', async (event) => {
+    await buildImage();
+});
+createPalleteBtn.onclick = () => {
+    init(imageSpecification.imageDrawWidth,imageSpecification.imageRawData);
+}
 
-const buildImage = () => {
+async function buildImage(){
     const canvas = document.getElementById("canvas");
     const image = new Image();
     const fileReader = new FileReader();
-    const file = imageFile.files[0];
-   
+    const choosenFile = imageFile.files[0];
+
+    fileReader.readAsDataURL(choosenFile);
+
     fileReader.onload = () => {
+        image.src = fileReader.result;
         image.onload = () => {
             const context = canvas.getContext("2d");
             const imageAspectRatio = image.width / image.height;
             const canvasAspectRatio = canvas.width / canvas.height;
-            let drawWidth, drawHeight;
             
             imgWidth.innerText = image.width;
             imgHeight.innerText = image.height;
             imgAspectRatio.innerText = imageAspectRatio.toFixed(1);
             
             if(imageAspectRatio > canvasAspectRatio){
-                drawWidth = canvas.width;
-                drawHeight = canvas.width / imageAspectRatio;
+                imageSpecification.imageDrawWidth = canvas.width;
+                imageSpecification.imageDrawHeight = canvas.width / imageAspectRatio;
             }else{
-                drawHeight = canvas.height;
-                drawWidth = canvas.height * imageAspectRatio;
+                imageSpecification.imageDrawHeight = canvas.height;
+                imageSpecification.imageDrawWidth = canvas.height * imageAspectRatio;
             }
     
-            const drawX = (canvas.width - drawWidth) / 2;
-            const drawY = (canvas.height - drawHeight) / 2;
+            imageSpecification.imageDrawX = (canvas.width - imageSpecification.imageDrawWidth) / 2;
+            imageSpecification.imageDrawY = (canvas.height - imageSpecification.imageDrawHeight) / 2;
     
-            image.width = drawWidth;
-            image.height = drawHeight;
-            cropLimitator.style.width = drawWidth+"px";
-            cropLimitator.style.height = drawHeight+"px";
+            image.width = imageSpecification.imageDrawWidth;
+            image.height = imageSpecification.imageDrawHeight;
+            cropLimitator.style.width = image.width+"px";
+            cropLimitator.style.height = image.height+"px";
     
-            cropLimitator.style.transform = `translateX(${drawX}px) translateY(${drawY}px)`;
+            cropLimitator.style.transform = `translateX(${imageSpecification.imageDrawX}px) translateY(${imageSpecification.imageDrawY}px)`;
+
             context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(image, drawX, drawY, image.width, image.height);
+            context.drawImage(image, imageSpecification.imageDrawX, imageSpecification.imageDrawY, image.width, image.height);
 
-            const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
-            const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
-            const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
-            const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
+            imageSpecification.imageRawData = context.getImageData(imageSpecification.imageDrawX,imageSpecification.imageDrawY, image.width, image.height).data;
 
-            const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
-            
-            crop.resizeCropBox();
-            crop.moveCropBox();
-    
-            createPalleteBtn.onclick = (e) =>{
-                totalVariantColors = []
-                realPallet = []
-                const colorsPalete = document.querySelectorAll('.color-item');
-                colorsPalete.forEach(item=>{
-                    item.remove()
-                })
-                
-                const coords = crop.getCoordenates();
-                const imageData = context.getImageData(drawX,drawY, image.width, image.height);
-    
-                const rgbaColors = extractImageColors(imageData.data);
-    
-                const imageMatrix = transformImageInto2dMatrix(rgbaColors,image.width);
-    
-                const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
-    
-                const quantizationPallet = medianCutQuantization(pallete,0,8);
-                generatePallet(quantizationPallet);
-                createAmbienteMode(quantizationPallet);
-                
-            }
         }
-        image.src = fileReader.result
     }
-    fileReader.readAsDataURL(file);
+}
+
+/**
+ * @param {number} imageWidth 
+ * @param {Uint16Array} imageData 
+ */
+const init = (imageWidth,imageData) => {
+
+    const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
+    const imageContainerTop = Math.round(cropLimitator.getBoundingClientRect().top);
+    const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
+    const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
+
+    const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
+            
+    crop.resizeCropBox();
+    crop.moveCropBox();
+    
+    const colorsPalete = document.querySelectorAll('.color-item');
+    totalVariantColors = [];
+    realPallet = [];
+    colorsPalete.forEach(item=>{
+        item.remove()
+    })
+                
+    const coords = crop.getCoordenates();
+    
+    const rgbaColors = extractImageColors(imageData);
+    
+    const imageMatrix = transformImageInto2dMatrix(rgbaColors,imageWidth);
+    
+    const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
+    
+    const quantizationPallet = medianCutQuantization(pallete,0,8);
+    generatePallet(quantizationPallet);
+    createAmbienteMode(quantizationPallet);
 }
 /**
  * 
