@@ -4,8 +4,8 @@ const boxContainer = document.getElementById('crop-limitator');
 
 const TEMPLATE = `
     <div id="crop-box" class="crop-box">
-    <span id="crop-intern"></span>
-    <span id="point-right-up" class="point point-right point-right-down"></span>
+        <span id="crop-intern"></span>
+        <span id="point-right-up" class="point point-right point-right-down"></span>
     </div>
 `
 
@@ -24,27 +24,32 @@ class Cropper{
     parentWidth;
     parentHeight;
     template = TEMPLATE;
+
     constructor(parentLeft, parentTop,parentWidth,parentHeight){
-        this.mouseState = null;
         this.parentLeft = parentLeft;
         this.parentTop = parentTop;
         this.parentWidth = parentWidth;
         this.parentHeight = parentHeight;
+        this.mouseState = null;
     }
 
     render(){
         boxContainer.innerHTML = this.template;
-        cropBox = document.getElementById('crop-box');
-        cropIntern = document.getElementById('crop-intern');
+        cropBox    = this.elementSelectorDOM('crop-box');
+        cropIntern = this.elementSelectorDOM('crop-intern');
         cropBox.style.width = '140px';
+
         this.cropBoxLeftBounding = Math.round(cropBox.getBoundingClientRect().left);
         this.cropBoxTopBounding = Math.round(cropBox.getBoundingClientRect().top);
+
         this.startX = this.cropBoxLeftBounding - this.parentLeft;
-        this.startY = this.cropBoxTopBounding - this.parentTop;
-        this.width = cropBox.clientWidth;
+        this.startY = this.cropBoxTopBounding  - this.parentTop;
+        this.endX   = cropBox.offsetWidth  + this.startX;
+        this.endY   = cropBox.offsetHeight + this.startY;
+
+        this.width  = cropBox.clientWidth;
         this.height = cropBox.clientHeight;
-        this.endX = cropBox.offsetWidth + this.startX;
-        this.endY = cropBox.offsetHeight + this.startY;
+        
     }
 
     /**
@@ -114,6 +119,14 @@ class Cropper{
             this.endY = coords.endY;
         })
 
+    }
+
+    /**
+     * @param {string} elementID 
+     * @returns {HTMLElement}
+     */
+    elementSelectorDOM(elementID){
+        return document.getElementById(elementID)
     }
 
     resizeCropBox(){

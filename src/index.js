@@ -5,9 +5,9 @@ const imgWidth = document.getElementById("width-inf");
 const imgHeight = document.getElementById("height-inf");
 const imgAspectRatio = document.getElementById("ratio-info");
 const imageInput = document.getElementById("image-file");
-
 let totalVariantColors = []
 let realPallet = [];
+
 let imageSpecification = {
     imageRawData:null,
     imageDrawWidth: 0,
@@ -16,9 +16,18 @@ let imageSpecification = {
     imageDrawY:0
 }
 
+/**
+* @param {string} elementID 
+* @returns {HTMLElement}
+*/
+function elementSelectorDOM(elementID){
+    return document.getElementById(elementID)
+}
+
 imageInput.addEventListener('change',(event) => {
     buildImage();
 });
+
 createPalleteBtn.onclick = () => {
     initCrop();
 }
@@ -82,18 +91,23 @@ function buildImage(){
     }
 }
 
+function resetPallet(){
+    const colorsPalete = document.querySelectorAll('.color-item');
+    totalVariantColors = [];
+    realPallet = [];
+
+    colorsPalete.forEach(item=>{
+        item.remove()
+    })
+}
+
 /**
  * @param {number} imageWidth 
  * @param {Uint16Array} imageData 
  */
-const init = (imageWidth,imageData) => {    
-    const colorsPalete = document.querySelectorAll('.color-item');
-    totalVariantColors = [];
-    realPallet = [];
-    colorsPalete.forEach(item=>{
-        item.remove()
-    })
-                
+const init = (imageWidth,imageData) => {       
+    resetPallet();
+
     const coords = crop.getCoordenates();
     
     const rgbaColors = extractImageColors(imageData);
@@ -106,21 +120,20 @@ const init = (imageWidth,imageData) => {
     generatePallet(quantizationPallet);
     createAmbienteMode(quantizationPallet);
 }
+
+
 /**
  * @returns {Array}
  * @param {Uint8ClampedArray} imageData 
  */
-
 const extractImageColors = (imageData) => {
     const colors = []
 
     for(let i = 0; i< imageData.length; i += 4){
-        const alphaChannel = imageData[i + 3] / 255;
         const rgbaColors = {
             r: imageData[i],
             g: imageData[i + 1],
-            b: imageData[i + 2],
-            a: alphaChannel.toString().length > 1? parseFloat(alphaChannel.toFixed(2)) : alphaChannel
+            b: imageData[i + 2]
         }
         colors.push(rgbaColors)
     }
@@ -141,15 +154,13 @@ const medianCutQuantization = (rgbaColors, depth, colorDepth) => {
             prev.r += curr.r
             prev.g += curr.g
             prev.b += curr.b
-            prev.a += curr.a
 
             return prev;
-        },{r:0,g:0,b:0,a:0})
+        },{r:0,g:0,b:0})
         
         color.r = Math.round(color.r / rgbaColors.length);
         color.g = Math.round(color.g / rgbaColors.length);
         color.b = Math.round(color.b / rgbaColors.length);
-        color.a = Math.round(color.a / rgbaColors.length);
 
         return [color]
     }
@@ -168,40 +179,33 @@ const getBiggestChannelRange = (rgbaColors) => {
     let rMin = 255;
     let gMin = 255;
     let bMin = 255;
-    let aMin = 1;
 
     let rMax = 0;
     let gMax = 0;
     let bMax = 0;
-    let aMax = 0;
 
     rgbaColors.forEach(color => {
         rMin = Math.min(rMin, color.r)
         gMin = Math.min(gMin, color.g)
         bMin = Math.min(bMin, color.b)
-        aMin = Math.min(aMin, color.a)
 
         rMax = Math.max(rMax, color.r)
         gMax = Math.max(gMax, color.g)
         bMax = Math.max(bMax, color.b)
-        aMax = Math.max(aMax, color.a)
     })
 
     const rRange = rMax - rMin;
     const gRange = gMax - gMin;
     const bRange = bMax - bMin;
-    const aRange = aMax - aMin;
 
     const biggestRange = Math.max(rRange, gRange, bRange);
     if(biggestRange === rRange){
         return "r";
     }else if(biggestRange === gRange){
         return "g";
-    }else if(biggestRange === bRange){
-        return "b";
-    }else{
-        return "a"
     }
+    return "b";
+
 }
 
 /**
