@@ -1,6 +1,6 @@
 let cropBox = document.getElementById('crop-box');
-const boxContainer = document.getElementById('crop-limitator');
 let cropIntern = document.getElementById('crop-intern');
+const boxContainer = document.getElementById('crop-limitator');
 
 const TEMPLATE = `
     <div id="crop-box" class="crop-box">
@@ -30,7 +30,6 @@ class Cropper{
         this.parentTop = parentTop;
         this.parentWidth = parentWidth;
         this.parentHeight = parentHeight;
-        
     }
 
     render(){
@@ -139,7 +138,7 @@ class Cropper{
                 let pixelHeight = (((pixelToMoveY * 100) / this.height) / 100) * this.height;
                 
                 cropBox.style.width = `${this.width + pixelWidth}px`;
-                cropBox.style.height = `${(this.height+pixelHeight)}px`;
+                cropBox.style.height = `${this.height + pixelHeight}px`;
                 
             }
         })

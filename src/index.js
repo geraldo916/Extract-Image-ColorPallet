@@ -4,7 +4,8 @@ const createPalleteBtn = document.getElementById("create-pallet");
 const imgWidth = document.getElementById("width-inf");
 const imgHeight = document.getElementById("height-inf");
 const imgAspectRatio = document.getElementById("ratio-info");
-const imageFile = document.getElementById("image-file");
+const imageInput = document.getElementById("image-file");
+
 let totalVariantColors = []
 let realPallet = [];
 let imageSpecification = {
@@ -15,8 +16,8 @@ let imageSpecification = {
     imageDrawY:0
 }
 
-imageFile.addEventListener('change', async (event) => {
-    await buildImage();
+imageInput.addEventListener('change',(event) => {
+    buildImage();
 });
 createPalleteBtn.onclick = () => {
     initCrop();
@@ -35,11 +36,11 @@ function initCrop(){
     crop.moveCropBox();
 }
 
-async function buildImage(){
+function buildImage(){
     const canvas = document.getElementById("canvas");
     const image = new Image();
     const fileReader = new FileReader();
-    const choosenFile = imageFile.files[0];
+    const choosenFile = imageInput.files[0];
 
     fileReader.readAsDataURL(choosenFile);
 
@@ -106,7 +107,7 @@ const init = (imageWidth,imageData) => {
     createAmbienteMode(quantizationPallet);
 }
 /**
- * 
+ * @returns {Array}
  * @param {Uint8ClampedArray} imageData 
  */
 
@@ -217,6 +218,11 @@ const calculateColorDistance = (color1, color2) => {
     return rDifference + gDifference + bDifference;
 }
 
+/**
+ * @param {Array} colorArray 
+ * @param {number} imageWidth 
+ * @returns 
+ */
 const transformImageInto2dMatrix = (colorArray,imageWidth) => {
 
     const imageMatrixLength = Math.round(colorArray.length / imageWidth);
@@ -230,11 +236,13 @@ const transformImageInto2dMatrix = (colorArray,imageWidth) => {
 }
 
 const generatePallet = (pixels) => {
+    const MAX_DISTANCE_BETWEEN_COLORS = 4094;
+
     for(let index = 0; index < pixels.length; index++){
 
         if(index > 0){
-            const diff = calculateColorDistance(pixels[index], pixels[index - 1]);
-            if(diff < 2094){
+            const colorDifference = calculateColorDistance(pixels[index], pixels[index - 1]);
+            if(colorDifference < MAX_DISTANCE_BETWEEN_COLORS / 2){
                 continue;
             }
         }
@@ -276,10 +284,11 @@ const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
  */
 
 const createAmbienteMode = (colors) => {
+    const MAX_DISTANCE_BETWEEN_COLORS = 4094;
     for(let j = 0; j < colors.length; j++){
         if( j > 0){
             const diff = calculateColorDistance(colors[j], colors[j-1]);
-            if(diff < 4094){
+            if(diff < MAX_DISTANCE_BETWEEN_COLORS){
                 continue;
             }
             totalVariantColors.push(colors[j])
