@@ -119,11 +119,11 @@ const extractColorPallete = () => {
     
     const imageMatrix = transformImageInto2dMatrix(rgbaColors,imageSpecification.imageDrawWidth);
     
-    const pallete = getColorsByCoordsXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
+    const largeAmountColors = getColorsByCoordsXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
     
-    const quantizationPallet = medianCutQuantization(pallete,0,8);
-    generatePallet(quantizationPallet);
-    createAmbienteMode(quantizationPallet);
+    const quantizationColors = medianCutQuantization(largeAmountColors,0,8);
+    const pallete =  generatePallet(quantizationColors);
+    createAmbienteMode(pallete);
 }
 
 
@@ -292,22 +292,13 @@ const getColorsByCoordsXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
  */
 
 const createAmbienteMode = (colors) => {
-    const MAX_DISTANCE_BETWEEN_COLORS = 4094;
-    for(let j = 0; j < colors.length; j++){
-        if( j > 0){
-            const diff = calculateColorDistance(colors[j], colors[j-1]);
-            if(diff < MAX_DISTANCE_BETWEEN_COLORS/2){
-                continue;
-            }
-            totalVariantColors.push(colors[j])
-        }
-    }
-    
-    if(totalVariantColors.length === 1){
-        let color = totalVariantColors[0];
+    let color = null;
+    if(colors.length >= 2){
+        color = colors[2];
         document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
+        return;
     }
-    let color = totalVariantColors[0];
+    color = colors[0];
     document.getElementById('ambient-mode').style.backgroundImage = `linear-gradient(to bottom,rgba(${color.r},${color.g},${color.b},0.949) 28%, transparent)`
     
 }
