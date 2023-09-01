@@ -99,7 +99,7 @@ class Cropper{
         
         boxContainer.addEventListener('mousemove',(e)=>{
             if(this.mouseState === 'move'){
-                let coords = this.getInicialCoords();
+                let coords   = this.getInicialCoords();
                 pixelToMoveX = e.clientX - startX + coords.startX;
                 pixelToMoveY = e.clientY - startY + coords.startY;
                 

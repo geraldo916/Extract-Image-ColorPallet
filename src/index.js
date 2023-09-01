@@ -5,7 +5,9 @@ const imgWidth = document.getElementById("width-inf");
 const imgHeight = document.getElementById("height-inf");
 const imgAspectRatio = document.getElementById("ratio-info");
 const imageInput = document.getElementById("image-file");
-let totalVariantColors = []
+
+let crop = null;
+let totalVariantColors = [];
 let realPallet = [];
 
 let imageSpecification = {
@@ -25,12 +27,14 @@ function elementSelectorDOM(elementID){
 }
 
 imageInput.addEventListener('change',(event) => {
+    resetPallet();
     buildImage();
 });
 
 createPalleteBtn.onclick = () => {
-    initCrop();
+    extractColorPallete();
 }
+
 
 function initCrop(){ 
     const imageContainerLeft = Math.round(cropLimitator.getBoundingClientRect().left);
@@ -38,7 +42,7 @@ function initCrop(){
     const imageContainerWidth = Math.round(cropLimitator.getBoundingClientRect().width);
     const imageContainerHeight = Math.round(cropLimitator.getBoundingClientRect().height);
 
-    const crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
+    crop = new Cropper(imageContainerLeft,imageContainerTop,imageContainerWidth,imageContainerHeight);
     
     crop.render();
     crop.resizeCropBox();
@@ -87,6 +91,7 @@ function buildImage(){
 
             imageSpecification.imageRawData = context.getImageData(imageSpecification.imageDrawX,imageSpecification.imageDrawY, image.width, image.height).data;
 
+            initCrop();
         }
     }
 }
@@ -105,16 +110,16 @@ function resetPallet(){
  * @param {number} imageWidth 
  * @param {Uint16Array} imageData 
  */
-const init = (imageWidth,imageData) => {       
+const extractColorPallete = () => {       
     resetPallet();
 
     const coords = crop.getCoordenates();
     
-    const rgbaColors = extractImageColors(imageData);
+    const rgbaColors = extractImageColors(imageSpecification.imageRawData);
     
-    const imageMatrix = transformImageInto2dMatrix(rgbaColors,imageWidth);
+    const imageMatrix = transformImageInto2dMatrix(rgbaColors,imageSpecification.imageDrawWidth);
     
-    const pallete = extractPalletColorXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
+    const pallete = getColorsByCoordsXY(imageMatrix,coords.startY,coords.endY,coords.startX,coords.endX)
     
     const quantizationPallet = medianCutQuantization(pallete,0,8);
     generatePallet(quantizationPallet);
@@ -228,7 +233,6 @@ const calculateColorDistance = (color1, color2) => {
  * @returns 
  */
 const transformImageInto2dMatrix = (colorArray,imageWidth) => {
-
     const imageMatrixLength = Math.round(colorArray.length / imageWidth);
     let imageMatrix = new Array(imageMatrixLength);
 
@@ -246,7 +250,7 @@ const generatePallet = (pixels) => {
 
         if(index > 0){
             const colorDifference = calculateColorDistance(pixels[index], pixels[index - 1]);
-            if(colorDifference < MAX_DISTANCE_BETWEEN_COLORS / 2){
+            if(colorDifference < MAX_DISTANCE_BETWEEN_COLORS){
                 continue;
             }
         }
@@ -268,7 +272,7 @@ const generatePallet = (pixels) => {
     return realPallet;
 }
 
-const extractPalletColorXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
+const getColorsByCoordsXY = (imageMatrix, yStart, yEnd, xStart, xEnd) => {
     const pixels = [];
     for(let i = 0; i < imageMatrix.length; i++){
         if(i >= yStart && i <= yEnd){
@@ -292,7 +296,7 @@ const createAmbienteMode = (colors) => {
     for(let j = 0; j < colors.length; j++){
         if( j > 0){
             const diff = calculateColorDistance(colors[j], colors[j-1]);
-            if(diff < MAX_DISTANCE_BETWEEN_COLORS){
+            if(diff < MAX_DISTANCE_BETWEEN_COLORS/2){
                 continue;
             }
             totalVariantColors.push(colors[j])
