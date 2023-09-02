@@ -10,19 +10,7 @@ const TEMPLATE = `
 `
 
 class Cropper{
-    mouseState;
-    startX;
-    startY;
-    endX;
-    endY;
-    width;
-    height;
-    cropBoxLeftBounding;
-    cropBoxTopBounding;
-    parentLeft;
-    parentTop;
-    parentWidth;
-    parentHeight;
+
     template = TEMPLATE;
 
     constructor(parentLeft, parentTop,parentWidth,parentHeight){
