@@ -261,10 +261,11 @@ const generatePallet = (pixels) => {
             const div = document.createElement("div");
             div.classList.add("color-item")
             const background = `rgba(${pixels[index].r},${pixels[index].g},${pixels[index].b},1)`;
+            const hexadecimalCode = `#${pixels[index].r.toString("16")}${pixels[index].g.toString("16")}${pixels[index].b.toString("16")}`
             div.style.width = `120px`;
             div.style.height = "120px";
             div.style.backgroundColor = background;
-            div.innerText = `#${pixels[index].r.toString("16")}${pixels[index].g.toString("16")}${pixels[index].b.toString("16")}`
+            div.innerText = hexadecimalCode;
 
             pallet.appendChild(div);
             realPallet.push(pixels[index])
