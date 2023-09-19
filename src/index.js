@@ -83,8 +83,10 @@ function buildImage(){
             image.height = imageSpecification.imageDrawHeight;
             cropLimitator.style.width = image.width+"px";
             cropLimitator.style.height = image.height+"px";
-    
-            cropLimitator.style.transform = `translateX(${imageSpecification.imageDrawX}px) translateY(${imageSpecification.imageDrawY}px)`;
+            
+            cropLimitator.style.transform = `
+                translateX(${imageSpecification.imageDrawX}px)
+                translateY(${imageSpecification.imageDrawY}px)`;
 
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.drawImage(image, imageSpecification.imageDrawX, imageSpecification.imageDrawY, image.width, image.height);
